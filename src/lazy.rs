@@ -2,7 +2,9 @@
 //! be very unhappy. We rely heavily on TSAN for finding
 //! races, so we don't use `lazy_static`.
 
-use std::sync::atomic::{AtomicBool, AtomicPtr, Ordering::SeqCst};
+use std::sync::atomic::{
+    AtomicBool, AtomicPtr, Ordering::SeqCst,
+};
 
 /// A lazily initialized value
 pub struct Lazy<T, F> {
@@ -58,7 +60,11 @@ where
         // or the current value on failure. We want to keep
         // looping as long as it returns true, so we don't need
         // any explicit conversion here.
-        while self.init_mu.compare_and_swap(false, true, SeqCst) {}
+        while self
+            .init_mu
+            .compare_exchange(false, true, SeqCst, SeqCst)
+            .is_err()
+        {}
 
         {
             let value_ptr = self.value.load(SeqCst);
@@ -66,7 +72,8 @@ where
             // maybe some other thread completed
             // the initialization already.
             if !value_ptr.is_null() {
-                let unlock = self.init_mu.swap(false, SeqCst);
+                let unlock =
+                    self.init_mu.swap(false, SeqCst);
                 assert!(unlock);
                 #[allow(unsafe_code)]
                 unsafe {
