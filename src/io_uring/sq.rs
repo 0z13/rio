@@ -46,7 +46,7 @@ impl Sq {
     ) -> io::Result<Sq> {
         let sq_ring_mmap_sz = params.sq_off.array as usize
             + (params.sq_entries as usize
-                * std::mem::size_of::<u32>());
+                *size_of::<u32>());
 
         // TODO IORING_FEAT_SINGLE_MMAP for sq
 
@@ -58,7 +58,7 @@ impl Sq {
 
         let sqes_mmap_sz: usize = params.sq_entries
             as usize
-            * std::mem::size_of::<io_uring_sqe>();
+            *size_of::<io_uring_sqe>();
 
         let sqes_ptr: *mut io_uring_sqe = uring_mmap(
             sqes_mmap_sz,

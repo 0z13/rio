@@ -413,7 +413,7 @@ impl Uring {
         file: &'a File,
         ordering: Ordering,
     ) -> Completion<'a, ()> {
-        self.with_sqe(None, false, |mut sqe| {
+        self.with_sqe(None, false, |sqe| {
             sqe.prep_rw(
                 IORING_OP_FSYNC,
                 file.as_raw_fd(),
@@ -471,7 +471,7 @@ impl Uring {
         len: usize,
         ordering: Ordering,
     ) -> Completion<'a, ()> {
-        self.with_sqe(None, false, |mut sqe| {
+        self.with_sqe(None, false, |sqe| {
             sqe.prep_rw(
                 IORING_OP_SYNC_FILE_RANGE,
                 file.as_raw_fd(),
@@ -738,14 +738,14 @@ fn addr2raw(
             let b: *const std::net::SocketAddrV4 = a;
             (
                 b as *const _,
-                std::mem::size_of_val(a) as libc::socklen_t,
+                size_of_val(a) as libc::socklen_t,
             )
         }
         std::net::SocketAddr::V6(ref a) => {
             let b: *const std::net::SocketAddrV6 = a;
             (
                 b as *const _,
-                std::mem::size_of_val(a) as libc::socklen_t,
+                size_of_val(a) as libc::socklen_t,
             )
         }
     }

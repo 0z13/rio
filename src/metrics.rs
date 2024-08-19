@@ -1,9 +1,6 @@
 #![allow(unused_results)]
 #![allow(clippy::print_stdout)]
 
-#[cfg(feature = "measure_allocs")]
-use std::sync::atomic::AtomicU64;
-
 #[cfg(not(target_arch = "x86_64"))]
 use std::time::{Duration, Instant};
 
@@ -97,11 +94,6 @@ pub struct Metrics {
     pub wait: Histogram,
     pub ticket_queue_push: Histogram,
     pub ticket_queue_pop: Histogram,
-
-    #[cfg(feature = "measure_allocs")]
-    pub allocations: AtomicU64,
-    #[cfg(feature = "measure_allocs")]
-    pub allocated_bytes: AtomicU64,
 }
 
 impl Drop for Metrics {
@@ -214,25 +206,5 @@ impl Metrics {
                 .take(134)
                 .collect::<String>()
         );
-
-        #[cfg(feature = "measure_allocs")]
-        {
-            println!(
-                "{}",
-                std::iter::repeat("-")
-                    .take(134)
-                    .collect::<String>()
-            );
-            println!("allocation statistics:");
-            println!(
-                "total allocations: {}",
-                measure_allocs::ALLOCATIONS.load(Acquire)
-            );
-            println!(
-                "allocated bytes: {}",
-                measure_allocs::ALLOCATED_BYTES
-                    .load(Acquire)
-            );
-        }
     }
 }

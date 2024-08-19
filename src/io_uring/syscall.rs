@@ -62,7 +62,7 @@ pub(crate) fn enter(
                 i64::from(min_complete),
                 i64::from(flags),
                 sig as c_long,
-                core::mem::size_of::<libc::sigset_t>()
+                size_of::<libc::sigset_t>()
                     as c_long,
             )
         };
